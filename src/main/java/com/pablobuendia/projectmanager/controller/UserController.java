@@ -1,6 +1,6 @@
 package com.pablobuendia.projectmanager.controller;
 
-import com.pablobuendia.projectmanager.model.User;
+import com.pablobuendia.projectmanager.dto.UserDto;
 import com.pablobuendia.projectmanager.service.UserService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,22 +21,22 @@ public class UserController {
   private final UserService userService;
 
   @GetMapping("/users")
-  public List<User> getAllUsers() {
+  public List<UserDto> getAllUsers() {
     return userService.getAllUsers();
   }
 
   @PostMapping("/users")
-  public User createUser(@RequestBody User user) {
+  public UserDto createUser(@RequestBody UserDto user) {
     return userService.createUser(user);
   }
 
   @GetMapping("/users/{id}")
-  public User getUserById(@PathVariable Long id) {
+  public UserDto getUserById(@PathVariable Long id) {
     return userService.getUserById(id);
   }
 
   @PutMapping("/users/{id}")
-  public User updateUser(@PathVariable Long id, @RequestBody User user) {
+  public UserDto updateUser(@PathVariable Long id, @RequestBody UserDto user) {
     return userService.updateUser(id, user);
   }
 

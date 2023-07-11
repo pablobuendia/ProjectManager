@@ -1,6 +1,6 @@
 package com.pablobuendia.projectmanager.controller;
 
-import com.pablobuendia.projectmanager.model.Project;
+import com.pablobuendia.projectmanager.dto.ProjectDto;
 import com.pablobuendia.projectmanager.service.ProjectService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,22 +21,22 @@ public class ProjectController {
   private final ProjectService projectService;
 
   @GetMapping("/projects")
-  public List<Project> getAllProjects() {
+  public List<ProjectDto> getAllProjects() {
     return projectService.getAllProjects();
   }
 
   @PostMapping("/projects")
-  public Project createProject(@RequestBody Project project) {
+  public ProjectDto createProject(@RequestBody ProjectDto project) {
     return projectService.createProject(project);
   }
 
   @GetMapping("/projects/{id}")
-  public Project getProjectById(@PathVariable Long id) {
+  public ProjectDto getProjectById(@PathVariable Long id) {
     return projectService.getProjectById(id);
   }
 
   @PutMapping("/projects/{id}")
-  public Project updateProject(@PathVariable Long id, @RequestBody Project project) {
+  public ProjectDto updateProject(@PathVariable Long id, @RequestBody ProjectDto project) {
     return projectService.updateProject(id, project);
   }
 
