@@ -11,6 +11,8 @@ import com.pablobuendia.projectmanager.dto.UserDto;
 import com.pablobuendia.projectmanager.model.Project;
 import com.pablobuendia.projectmanager.model.User;
 import com.pablobuendia.projectmanager.repository.ProjectRepository;
+import com.pablobuendia.projectmanager.repository.UserRepository;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -32,7 +34,8 @@ class ProjectServiceTest {
   private static final String USER_EMAIL = "pablo@projectmanager.com";
   @Mock
   private ProjectRepository projectRepository;
-
+  @Mock
+  private UserRepository userRepository;
   @Mock
   private ModelMapper modelMapper;
 
@@ -139,6 +142,23 @@ class ProjectServiceTest {
     projectService.deleteProject(PROJECT_ID);
 
     verify(projectRepository, times(1)).deleteById(PROJECT_ID);
+  }
+
+  @Test
+  void addUserToProject() {
+    User user = buildUser();
+    UserDto userDto = buildUserDto();
+
+    Project project = buildProject(new HashSet<>());
+    ProjectDto projectDto = buildProjectDto(new HashSet<>());
+
+    when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.of(project));
+    when(projectRepository.save(project)).thenReturn(project);
+    when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
+
+    projectService.addUserToProject(PROJECT_ID, USER_ID);
+
+    verify(projectRepository, times(1)).save(project);
   }
 
   private static User buildUser() {

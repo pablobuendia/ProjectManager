@@ -5,6 +5,7 @@ import com.pablobuendia.projectmanager.dto.ProjectDto;
 import com.pablobuendia.projectmanager.exception.ResourceNotFoundException;
 import com.pablobuendia.projectmanager.model.Project;
 import com.pablobuendia.projectmanager.repository.ProjectRepository;
+import com.pablobuendia.projectmanager.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 public class ProjectService {
 
   private final ProjectRepository projectRepository;
+  private final UserRepository userRepository;
   private final ModelMapper modelMapper;
 
   public List<ProjectDto> getAllProjects() {
@@ -47,5 +49,17 @@ public class ProjectService {
 
   public void deleteProject(final Long id) {
     projectRepository.deleteById(id);
+  }
+
+  public void addUserToProject(final Long id, final Long userId) {
+    val project = projectRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+
+    userRepository
+        .findById(userId)
+        .ifPresentOrElse(user -> {
+          project.getUsers().add(user);
+          projectRepository.save(project);
+        }, () -> new ResourceNotFoundException("User not found"));
   }
 }
