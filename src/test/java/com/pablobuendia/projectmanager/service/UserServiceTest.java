@@ -1,7 +1,9 @@
 package com.pablobuendia.projectmanager.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -24,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -125,6 +128,38 @@ class UserServiceTest {
     verify(userRepository).deleteById(USER_ID);
   }
 
+  @Test
+  void searchValidUsers() {
+    User user = buildUser();
+    UserDto userDto = buildUserDto();
+
+    Page<User> usersPage = new PageImpl<>(List.of(user));
+
+    when(userRepository.findAll(any(Specification.class), eq(PageRequest.of(0, 10)))).thenReturn(
+        usersPage);
+    when(modelMapper.map(user, UserDto.class)).thenReturn(userDto);
+
+    List<UserDto> response = userService.searchUsers(Pageable.ofSize(10), USER_NAME, USER_EMAIL);
+
+    assertEquals(1, response.size());
+    assertEquals(USER_ID, response.get(0).getId());
+    assertEquals(USER_NAME, response.get(0).getName());
+    assertEquals(USER_EMAIL, response.get(0).getEmail());
+  }
+
+  @Test
+  void searchUsersEmpty() {
+    User user = buildUser();
+
+    when(userRepository.findAll(any(Specification.class), eq(PageRequest.of(0, 10)))).thenReturn(
+        Page.empty());
+
+    List<UserDto> response = userService.searchUsers(Pageable.ofSize(10), "Invalid name",
+        "Invalid email");
+
+    assertEquals(0, response.size());
+  }
+
   private static User buildUser() {
     User user = new User();
     user.setId(USER_ID);
@@ -158,4 +193,5 @@ class UserServiceTest {
     project.setUsers(users);
     return project;
   }
+
 }

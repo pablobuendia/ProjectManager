@@ -11,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -52,5 +54,25 @@ public class UserService {
       projectRepository.save(project);
     });
     userRepository.deleteById(id);
+  }
+
+  public List<UserDto> searchUsers(final Pageable pageable, final String name, final String email) {
+    Specification<User> spec = Specification.where(null);
+
+    if (StringUtils.hasText(name)) {
+      spec = spec.and((root, query, criteriaBuilder) ->
+          criteriaBuilder.like(criteriaBuilder.lower(root.get("name")),
+              "%" + name.toLowerCase() + "%"));
+    }
+
+    if (StringUtils.hasText(email)) {
+      spec = spec.and((root, query, criteriaBuilder) ->
+          criteriaBuilder.like(criteriaBuilder.lower(root.get("email")),
+              "%" + email.toLowerCase() + "%"));
+    }
+
+    return userRepository.findAll(spec, pageable).stream()
+        .map(user -> modelMapper.map(user, UserDto.class))
+        .toList();
   }
 }

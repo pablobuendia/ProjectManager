@@ -29,6 +29,15 @@ public class UserController {
     return userService.getAllUsers(PageRequest.of(page, size));
   }
 
+  @GetMapping("/users/search")
+  public List<UserDto> searchUsers(
+      @RequestParam(defaultValue = "0") final int page,
+      @RequestParam(defaultValue = "10") final int size,
+      @RequestParam(required = false) String name,
+      @RequestParam(required = false) String email) {
+    return userService.searchUsers(PageRequest.of(page, size), name, email);
+  }
+
   @PostMapping("/users")
   public UserDto createUser(@RequestBody final UserDto user) {
     return userService.createUser(user);
