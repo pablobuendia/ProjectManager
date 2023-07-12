@@ -20,6 +20,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -46,10 +50,11 @@ class UserServiceTest {
     User user = buildUser();
     UserDto userDto = buildUserDto();
 
-    when(userRepository.findAll()).thenReturn(List.of(user));
+    Page<User> usersPage = new PageImpl<>(List.of(user));
+    when(userRepository.findAll(PageRequest.of(0, 10))).thenReturn(usersPage);
     when(modelMapper.map(user, UserDto.class)).thenReturn(userDto);
 
-    List<UserDto> users = userService.getAllUsers();
+    List<UserDto> users = userService.getAllUsers(Pageable.ofSize(10));
 
     assertEquals(1, users.size());
     assertEquals(USER_ID, users.get(0).getId());
@@ -107,7 +112,7 @@ class UserServiceTest {
   @Test
   void deleteUser() {
     User user = buildUser();
-    
+
     Set<User> users = new HashSet<>();
     users.add(user);
     Project project = buildProject(users);

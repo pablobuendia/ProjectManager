@@ -22,6 +22,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectServiceTest {
@@ -50,10 +54,11 @@ class ProjectServiceTest {
     Project project = buildProject(Set.of(user));
     ProjectDto projectDto = buildProjectDto(null);
 
-    when(projectRepository.findAll()).thenReturn(List.of(project));
+    Page<Project> projectsPage = new PageImpl<>(List.of(project));
+    when(projectRepository.findAll(PageRequest.of(0, 10))).thenReturn(projectsPage);
     when(modelMapper.map(project, ProjectDto.class)).thenReturn(projectDto);
 
-    List<ProjectDto> projects = projectService.getAllProjects();
+    List<ProjectDto> projects = projectService.getAllProjects(Pageable.ofSize(10));
 
     assertEquals(1, projects.size());
     assertEquals(PROJECT_ID, projects.get(0).getId());

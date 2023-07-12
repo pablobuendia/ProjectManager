@@ -10,6 +10,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,8 +21,8 @@ public class ProjectService {
   private final UserRepository userRepository;
   private final ModelMapper modelMapper;
 
-  public List<ProjectDto> getAllProjects() {
-    return projectRepository.findAll().stream().map(project -> {
+  public List<ProjectDto> getAllProjects(final Pageable pageable) {
+    return projectRepository.findAll(pageable).stream().map(project -> {
       project.setUsers(null);
       return project;
     }).map(project -> modelMapper.map(project, ProjectDto.class)).toList();
