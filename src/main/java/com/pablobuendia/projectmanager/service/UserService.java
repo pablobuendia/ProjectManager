@@ -2,7 +2,7 @@ package com.pablobuendia.projectmanager.service;
 
 
 import com.pablobuendia.projectmanager.dto.UserDto;
-import com.pablobuendia.projectmanager.exception.ResourceNotFoundException;
+import com.pablobuendia.projectmanager.exception.UserNotFoundException;
 import com.pablobuendia.projectmanager.model.User;
 import com.pablobuendia.projectmanager.repository.ProjectRepository;
 import com.pablobuendia.projectmanager.repository.UserRepository;
@@ -36,12 +36,12 @@ public class UserService {
 
   public UserDto getUserById(final Long id) {
     return modelMapper.map(userRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("User not found")), UserDto.class);
+        .orElseThrow(UserNotFoundException::new), UserDto.class);
   }
 
   public UserDto updateUser(final Long id, final UserDto userDto) {
     val userToUpdate = userRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        .orElseThrow(UserNotFoundException::new);
 
     userToUpdate.setName(userDto.getName());
     userToUpdate.setEmail(userDto.getEmail());
@@ -49,6 +49,9 @@ public class UserService {
   }
 
   public void deleteUser(final Long id) {
+    if (!userRepository.existsById(id)) {
+      throw new UserNotFoundException();
+    }
     projectRepository.findAll().forEach(project -> {
       project.getUsers().removeIf(user -> user.getId().equals(id));
       projectRepository.save(project);

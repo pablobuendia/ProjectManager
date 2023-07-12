@@ -29,10 +29,10 @@ public class Project {
   @Column(name = "id", nullable = false)
   private Long id;
 
-  @Column(name = "name", nullable = false)
+  @Column(name = "name", nullable = false, length = 100)
   private String name;
 
-  @Column(name = "description")
+  @Column(name = "description", length = 200)
   private String description;
 
   @ManyToMany

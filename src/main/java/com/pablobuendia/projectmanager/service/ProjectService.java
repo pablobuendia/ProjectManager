@@ -2,7 +2,8 @@ package com.pablobuendia.projectmanager.service;
 
 
 import com.pablobuendia.projectmanager.dto.ProjectDto;
-import com.pablobuendia.projectmanager.exception.ResourceNotFoundException;
+import com.pablobuendia.projectmanager.exception.ProjectNotFoundException;
+import com.pablobuendia.projectmanager.exception.UserNotFoundException;
 import com.pablobuendia.projectmanager.model.Project;
 import com.pablobuendia.projectmanager.repository.ProjectRepository;
 import com.pablobuendia.projectmanager.repository.UserRepository;
@@ -39,12 +40,12 @@ public class ProjectService {
 
   public ProjectDto getProjectById(final Long id) {
     return modelMapper.map(projectRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Project not found")), ProjectDto.class);
+        .orElseThrow(ProjectNotFoundException::new), ProjectDto.class);
   }
 
   public ProjectDto updateProject(final Long id, final ProjectDto project) {
     val projectToUpdate = projectRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+        .orElseThrow(ProjectNotFoundException::new);
     projectToUpdate.setName(project.getName());
     projectToUpdate.setDescription(project.getDescription());
     return modelMapper.map(projectRepository.save(projectToUpdate), ProjectDto.class);
@@ -56,14 +57,14 @@ public class ProjectService {
 
   public void addUserToProject(final Long id, final Long userId) {
     val project = projectRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+        .orElseThrow(ProjectNotFoundException::new);
 
     userRepository
         .findById(userId)
         .ifPresentOrElse(user -> {
           project.getUsers().add(user);
           projectRepository.save(project);
-        }, () -> new ResourceNotFoundException("User not found"));
+        }, UserNotFoundException::new);
   }
 
   public List<ProjectDto> searchProjects(final Pageable pageable, final String name) {
