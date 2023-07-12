@@ -5,9 +5,11 @@ import com.pablobuendia.projectmanager.dto.ProjectDto;
 import com.pablobuendia.projectmanager.exception.ProjectNotFoundException;
 import com.pablobuendia.projectmanager.exception.UserNotFoundException;
 import com.pablobuendia.projectmanager.model.Project;
+import com.pablobuendia.projectmanager.model.User;
 import com.pablobuendia.projectmanager.repository.ProjectRepository;
 import com.pablobuendia.projectmanager.repository.UserRepository;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.modelmapper.ModelMapper;
@@ -31,11 +33,18 @@ public class ProjectService {
     }).toList();
   }
 
-  public ProjectDto createProject(final ProjectDto project) {
-    return modelMapper
-        .map(
-            projectRepository.save(modelMapper.map(project, Project.class)),
-            ProjectDto.class);
+  public ProjectDto createProject(final ProjectDto projectDto) {
+    val project = modelMapper.map(projectDto, Project.class);
+
+    if (project.getUsers() != null) {
+      project.setUsers(
+          project.getUsers().stream().filter(user ->
+                  userRepository.existsById(user.getId()))
+              .map(user -> userRepository.findById(user.getId()).orElse(new User()))
+              .collect(Collectors.toSet()));
+    }
+
+    return modelMapper.map(projectRepository.save(project), ProjectDto.class);
   }
 
   public ProjectDto getProjectById(final Long id) {
@@ -49,6 +58,16 @@ public class ProjectService {
           .orElseThrow(ProjectNotFoundException::new);
       projectToUpdate.setName(project.getName());
       projectToUpdate.setDescription(project.getDescription());
+
+      if (project.getUsers() != null) {
+        projectToUpdate.setUsers(
+            project.getUsers().stream().filter(user ->
+                    userRepository.existsById(user.getId()))
+                .map(user -> userRepository.findById(user.getId()).orElse(new User()))
+                .collect(Collectors.toSet()));
+      } else {
+        projectToUpdate.setUsers(null);
+      }
       return modelMapper.map(projectRepository.save(projectToUpdate), ProjectDto.class);
     }
 
@@ -70,7 +89,9 @@ public class ProjectService {
         .ifPresentOrElse(user -> {
           project.getUsers().add(user);
           projectRepository.save(project);
-        }, UserNotFoundException::new);
+        }, () -> {
+          throw new UserNotFoundException();
+        });
   }
 
   public List<ProjectDto> searchProjects(final Pageable pageable, final String name) {

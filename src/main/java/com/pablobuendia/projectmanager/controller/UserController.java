@@ -3,7 +3,6 @@ package com.pablobuendia.projectmanager.controller;
 import com.pablobuendia.projectmanager.dto.UserDto;
 import com.pablobuendia.projectmanager.service.UserService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +38,7 @@ public class UserController {
       @RequestParam(defaultValue = "0") @PositiveOrZero final int page,
       @RequestParam(defaultValue = "10") @PositiveOrZero final int size,
       @RequestParam(required = false) String name,
-      @RequestParam(required = false) @Email String email) {
+      @RequestParam(required = false) String email) {
     return userService.searchUsers(PageRequest.of(page, size), name, email);
   }
 
