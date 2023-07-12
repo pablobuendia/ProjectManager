@@ -1,6 +1,7 @@
 package com.pablobuendia.projectmanager.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -9,12 +10,14 @@ import static org.mockito.Mockito.when;
 
 import com.pablobuendia.projectmanager.dto.ProjectDto;
 import com.pablobuendia.projectmanager.dto.UserDto;
+import com.pablobuendia.projectmanager.exception.UserAlreadyExistsException;
 import com.pablobuendia.projectmanager.model.Project;
 import com.pablobuendia.projectmanager.model.User;
 import com.pablobuendia.projectmanager.repository.ProjectRepository;
 import com.pablobuendia.projectmanager.repository.UserRepository;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -82,6 +85,16 @@ class UserServiceTest {
   }
 
   @Test
+  void createUserAlreadyExists() {
+    UserDto userDto = buildUserDto();
+    User user = buildUser();
+
+    when(userRepository.existsByEmail(USER_EMAIL)).thenReturn(true);
+
+    assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(userDto));
+  }
+
+  @Test
   void getUserById() {
     User user = buildUser();
     UserDto userDto = buildUserDto();
@@ -101,8 +114,26 @@ class UserServiceTest {
     User user = buildUser();
     UserDto userDto = buildUserDto();
 
-    when(userRepository.findById(USER_ID)).thenReturn(java.util.Optional.of(user));
+    when(userRepository.existsById(USER_ID)).thenReturn(true);
+    when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
     when(userRepository.save(user)).thenReturn(user);
+    when(modelMapper.map(user, UserDto.class)).thenReturn(userDto);
+
+    UserDto response = userService.updateUser(USER_ID, userDto);
+
+    assertEquals(USER_ID, response.getId());
+    assertEquals(USER_NAME, response.getName());
+    assertEquals(USER_EMAIL, response.getEmail());
+  }
+
+  @Test
+  void updateUserNotExistingId() {
+    User user = buildUser();
+    UserDto userDto = buildUserDto();
+
+    when(userRepository.existsById(USER_ID)).thenReturn(false);
+    when(userRepository.save(user)).thenReturn(user);
+    when(modelMapper.map(userDto, User.class)).thenReturn(user);
     when(modelMapper.map(user, UserDto.class)).thenReturn(userDto);
 
     UserDto response = userService.updateUser(USER_ID, userDto);

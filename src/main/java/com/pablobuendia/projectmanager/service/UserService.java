@@ -45,12 +45,17 @@ public class UserService {
   }
 
   public UserDto updateUser(final Long id, final UserDto userDto) {
-    val userToUpdate = userRepository.findById(id)
-        .orElseThrow(UserNotFoundException::new);
+    if (userRepository.existsById(id)) {
+      val userToUpdate = userRepository.findById(id)
+          .orElseThrow(UserNotFoundException::new);
 
-    userToUpdate.setName(userDto.getName());
-    userToUpdate.setEmail(userDto.getEmail());
-    return modelMapper.map(userRepository.save(userToUpdate), UserDto.class);
+      userToUpdate.setName(userDto.getName());
+      userToUpdate.setEmail(userDto.getEmail());
+      return modelMapper.map(userRepository.save(userToUpdate), UserDto.class);
+    }
+
+    return modelMapper.map(userRepository.save(modelMapper.map(userDto, User.class)),
+        UserDto.class);
   }
 
   public void deleteUser(final Long id) {

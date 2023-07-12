@@ -3,6 +3,7 @@ package com.pablobuendia.projectmanager.controller;
 import com.pablobuendia.projectmanager.dto.UserDto;
 import com.pablobuendia.projectmanager.service.UserService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,17 +29,17 @@ public class UserController {
 
   @GetMapping("/users")
   public List<UserDto> getAllUsers(
-      @RequestParam(defaultValue = "0") @PositiveOrZero final Integer page,
-      @RequestParam(defaultValue = "10") @PositiveOrZero final Integer size) {
+      @RequestParam(defaultValue = "0") @PositiveOrZero final int page,
+      @RequestParam(defaultValue = "10") @PositiveOrZero final int size) {
     return userService.getAllUsers(PageRequest.of(page, size));
   }
 
   @GetMapping("/users/search")
   public List<UserDto> searchUsers(
-      @RequestParam(defaultValue = "0") @PositiveOrZero final Integer page,
-      @RequestParam(defaultValue = "10") @PositiveOrZero final Integer size,
+      @RequestParam(defaultValue = "0") @PositiveOrZero final int page,
+      @RequestParam(defaultValue = "10") @PositiveOrZero final int size,
       @RequestParam(required = false) String name,
-      @RequestParam(required = false) String email) {
+      @RequestParam(required = false) @Email String email) {
     return userService.searchUsers(PageRequest.of(page, size), name, email);
   }
 
