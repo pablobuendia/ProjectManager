@@ -120,6 +120,7 @@ class UserServiceTest {
     users.add(user);
     Project project = buildProject(users);
 
+    when(userRepository.existsById(USER_ID)).thenReturn(true);
     when(projectRepository.findAll()).thenReturn(List.of(project));
 
     userService.deleteUser(USER_ID);

@@ -121,6 +121,32 @@ class ProjectServiceTest {
   }
 
   @Test
+  void updateProjectAlreadyExists() {
+    User user = buildUser();
+    UserDto userDto = buildUserDto();
+
+    Project project = buildProject(Set.of(user));
+    ProjectDto projectDto = buildProjectDto(Set.of(userDto));
+
+    when(projectRepository.existsById(PROJECT_ID)).thenReturn(true);
+    when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.of(project));
+    when(projectRepository.save(project)).thenReturn(project);
+    when(modelMapper.map(project, ProjectDto.class)).thenReturn(projectDto);
+
+    ProjectDto response = projectService.updateProject(PROJECT_ID, projectDto);
+
+    assertEquals(PROJECT_ID, response.getId());
+    assertEquals(PROJECT_NAME, response.getName());
+    assertEquals(PROJECT_DESCRIPTION, response.getDescription());
+
+    assertEquals(1, response.getUsers().size());
+    UserDto userFromProject = response.getUsers().iterator().next();
+    assertEquals(USER_ID, userFromProject.getId());
+    assertEquals(USER_NAME, userFromProject.getName());
+    assertEquals(USER_EMAIL, userFromProject.getEmail());
+  }
+
+  @Test
   void updateProject() {
     User user = buildUser();
     UserDto userDto = buildUserDto();
@@ -128,9 +154,9 @@ class ProjectServiceTest {
     Project project = buildProject(Set.of(user));
     ProjectDto projectDto = buildProjectDto(Set.of(userDto));
 
-    when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.of(project));
     when(projectRepository.save(project)).thenReturn(project);
     when(modelMapper.map(project, ProjectDto.class)).thenReturn(projectDto);
+    when(modelMapper.map(projectDto, Project.class)).thenReturn(project);
 
     ProjectDto response = projectService.updateProject(PROJECT_ID, projectDto);
 
