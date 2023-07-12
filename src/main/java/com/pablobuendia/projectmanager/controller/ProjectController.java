@@ -31,6 +31,14 @@ public class ProjectController {
     return projectService.getAllProjects(PageRequest.of(page, size));
   }
 
+  @GetMapping("/projects/search")
+  public List<ProjectDto> searchProjects(
+      @RequestParam(defaultValue = "0") final int page,
+      @RequestParam(defaultValue = "10") final int size,
+      @RequestParam(required = false) String name) {
+    return projectService.searchProjects(PageRequest.of(page, size), name);
+  }
+
   @PostMapping("/projects")
   public ProjectDto createProject(@RequestBody final ProjectDto project) {
     return projectService.createProject(project);

@@ -11,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -24,8 +26,8 @@ public class ProjectService {
   public List<ProjectDto> getAllProjects(final Pageable pageable) {
     return projectRepository.findAll(pageable).stream().map(project -> {
       project.setUsers(null);
-      return project;
-    }).map(project -> modelMapper.map(project, ProjectDto.class)).toList();
+      return modelMapper.map(project, ProjectDto.class);
+    }).toList();
   }
 
   public ProjectDto createProject(final ProjectDto project) {
@@ -62,5 +64,21 @@ public class ProjectService {
           project.getUsers().add(user);
           projectRepository.save(project);
         }, () -> new ResourceNotFoundException("User not found"));
+  }
+
+  public List<ProjectDto> searchProjects(final Pageable pageable, final String name) {
+    Specification<Project> spec = Specification.where(null);
+
+    if (StringUtils.hasText(name)) {
+      spec = spec.and((root, query, criteriaBuilder) ->
+          criteriaBuilder.like(criteriaBuilder.lower(root.get("name")),
+              "%" + name.toLowerCase() + "%"));
+    }
+
+    return projectRepository.findAll(spec, pageable).stream()
+        .map(project -> {
+          project.setUsers(null);
+          return modelMapper.map(project, ProjectDto.class);
+        }).toList();
   }
 }

@@ -2,6 +2,8 @@ package com.pablobuendia.projectmanager.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 @ExtendWith(MockitoExtension.class)
 class ProjectServiceTest {
@@ -164,6 +167,37 @@ class ProjectServiceTest {
     projectService.addUserToProject(PROJECT_ID, USER_ID);
 
     verify(projectRepository, times(1)).save(project);
+  }
+
+  @Test
+  void searchValidProjects() {
+    User user = buildUser();
+
+    Project project = buildProject(Set.of(user));
+    ProjectDto projectDto = buildProjectDto(null);
+
+    Page<Project> projectPage = new PageImpl<>(List.of(project));
+
+    when(projectRepository.findAll(any(Specification.class), eq(PageRequest.of(0, 10)))).thenReturn(
+        projectPage);
+    when(modelMapper.map(project, ProjectDto.class)).thenReturn(projectDto);
+
+    List<ProjectDto> response = projectService.searchProjects(Pageable.ofSize(10), PROJECT_NAME);
+
+    assertEquals(1, response.size());
+    assertNull(response.get(0).getUsers());
+  }
+
+  @Test
+  void searchProjectEmpty() {
+    User user = buildUser();
+
+    when(projectRepository.findAll(any(Specification.class), eq(PageRequest.of(0, 10)))).thenReturn(
+        Page.empty());
+
+    List<ProjectDto> response = projectService.searchProjects(Pageable.ofSize(10), "Invalid name");
+
+    assertEquals(0, response.size());
   }
 
   private static User buildUser() {
