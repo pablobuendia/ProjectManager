@@ -28,15 +28,15 @@ public class UserController {
 
   @GetMapping("/users")
   public List<UserDto> getAllUsers(
-      @RequestParam(defaultValue = "0") @PositiveOrZero final int page,
-      @RequestParam(defaultValue = "10") @PositiveOrZero final int size) {
+      @RequestParam(defaultValue = "0") @PositiveOrZero final Integer page,
+      @RequestParam(defaultValue = "10") @PositiveOrZero final Integer size) {
     return userService.getAllUsers(PageRequest.of(page, size));
   }
 
   @GetMapping("/users/search")
   public List<UserDto> searchUsers(
-      @RequestParam(defaultValue = "0") @PositiveOrZero final int page,
-      @RequestParam(defaultValue = "10") @PositiveOrZero final int size,
+      @RequestParam(defaultValue = "0") @PositiveOrZero final Integer page,
+      @RequestParam(defaultValue = "10") @PositiveOrZero final Integer size,
       @RequestParam(required = false) String name,
       @RequestParam(required = false) String email) {
     return userService.searchUsers(PageRequest.of(page, size), name, email);

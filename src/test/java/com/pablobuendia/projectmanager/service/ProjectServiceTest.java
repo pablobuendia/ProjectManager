@@ -220,7 +220,7 @@ class ProjectServiceTest {
     Project project = new Project();
     project.setId(PROJECT_ID);
     project.setName(PROJECT_NAME);
-    project.setDescription("Project Description 1");
+    project.setDescription(PROJECT_DESCRIPTION);
     project.setUsers(users);
     return project;
   }
@@ -229,7 +229,7 @@ class ProjectServiceTest {
     ProjectDto project = new ProjectDto();
     project.setId(PROJECT_ID);
     project.setName(PROJECT_NAME);
-    project.setDescription("Project Description 1");
+    project.setDescription(PROJECT_DESCRIPTION);
     project.setUsers(users);
     return project;
   }

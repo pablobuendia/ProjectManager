@@ -2,6 +2,7 @@ package com.pablobuendia.projectmanager.service;
 
 
 import com.pablobuendia.projectmanager.dto.UserDto;
+import com.pablobuendia.projectmanager.exception.UserAlreadyExistsException;
 import com.pablobuendia.projectmanager.exception.UserNotFoundException;
 import com.pablobuendia.projectmanager.model.User;
 import com.pablobuendia.projectmanager.repository.ProjectRepository;
@@ -30,6 +31,10 @@ public class UserService {
   }
 
   public UserDto createUser(final UserDto userDto) {
+    if (userRepository.existsByEmail(userDto.getEmail())) {
+      throw new UserAlreadyExistsException();
+    }
+
     return modelMapper.map(userRepository.save(modelMapper.map(userDto, User.class)),
         UserDto.class);
   }

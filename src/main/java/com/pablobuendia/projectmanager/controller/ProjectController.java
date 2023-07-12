@@ -69,7 +69,7 @@ public class ProjectController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void addUserToProject(
       @PathVariable @PositiveOrZero final Long id,
-      @PathVariable @Valid final Long userId) {
+      @PathVariable @PositiveOrZero final Long userId) {
     projectService.addUserToProject(id, userId);
   }
 }

@@ -1,7 +1,9 @@
 package com.pablobuendia.projectmanager.advice;
 
+import com.pablobuendia.projectmanager.exception.ProjectAlreadyExistsException;
 import com.pablobuendia.projectmanager.exception.ProjectNotFoundException;
 import com.pablobuendia.projectmanager.exception.ResourceNotFoundException;
+import com.pablobuendia.projectmanager.exception.UserAlreadyExistsException;
 import com.pablobuendia.projectmanager.exception.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
@@ -30,6 +32,45 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
       HttpServletRequest httpServletRequest) {
     ExceptionResponse response = new ExceptionResponse(
         HttpStatus.NOT_FOUND.value(), exception.getMessage(), LocalDateTime.now()
+    );
+
+    response.setPath(httpServletRequest.getRequestURI());
+    return response;
+  }
+
+  @ExceptionHandler(UserAlreadyExistsException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  @ResponseBody
+  public ExceptionResponse handleNotFoundExceptions(UserAlreadyExistsException exception,
+      HttpServletRequest httpServletRequest) {
+    ExceptionResponse response = new ExceptionResponse(
+        HttpStatus.CONFLICT.value(), exception.getMessage(), LocalDateTime.now()
+    );
+
+    response.setPath(httpServletRequest.getRequestURI());
+    return response;
+  }
+
+  @ExceptionHandler(ProjectAlreadyExistsException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  @ResponseBody
+  public ExceptionResponse handleNotFoundExceptions(ProjectAlreadyExistsException exception,
+      HttpServletRequest httpServletRequest) {
+    ExceptionResponse response = new ExceptionResponse(
+        HttpStatus.CONFLICT.value(), exception.getMessage(), LocalDateTime.now()
+    );
+
+    response.setPath(httpServletRequest.getRequestURI());
+    return response;
+  }
+
+  @ExceptionHandler(IllegalArgumentException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ResponseBody
+  public ExceptionResponse handleNotFoundExceptions(IllegalArgumentException exception,
+      HttpServletRequest httpServletRequest) {
+    ExceptionResponse response = new ExceptionResponse(
+        HttpStatus.BAD_REQUEST.value(), exception.getMessage(), LocalDateTime.now()
     );
 
     response.setPath(httpServletRequest.getRequestURI());

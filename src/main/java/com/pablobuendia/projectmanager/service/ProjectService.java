@@ -44,11 +44,17 @@ public class ProjectService {
   }
 
   public ProjectDto updateProject(final Long id, final ProjectDto project) {
-    val projectToUpdate = projectRepository.findById(id)
-        .orElseThrow(ProjectNotFoundException::new);
-    projectToUpdate.setName(project.getName());
-    projectToUpdate.setDescription(project.getDescription());
-    return modelMapper.map(projectRepository.save(projectToUpdate), ProjectDto.class);
+    if (projectRepository.existsById(id)) {
+      val projectToUpdate = projectRepository.findById(id)
+          .orElseThrow(ProjectNotFoundException::new);
+      projectToUpdate.setName(project.getName());
+      projectToUpdate.setDescription(project.getDescription());
+      return modelMapper.map(projectRepository.save(projectToUpdate), ProjectDto.class);
+    }
+
+    return modelMapper
+        .map(projectRepository.save(modelMapper.map(project, Project.class)),
+            ProjectDto.class);
   }
 
   public void deleteProject(final Long id) {
