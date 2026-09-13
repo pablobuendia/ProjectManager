@@ -12,7 +12,7 @@ REST API for managing users and projects. Made with Spring Boot.
 ## Running the application
 
 1. Clone the repository
-2. Run `gradlew clean bootRun` in the root directory
+2. Run `./mvnw clean spring-boot:run` in the root directory
 3. The application will be available at `localhost:8080`
 
 ## Swagger
@@ -25,4 +25,4 @@ Swagger documentation is available at `/swagger-ui/index.html#/` endpoint.
 - [ ] Implement sorting
 - [ ] Add Spring Security
 - [ ] Replace auto-generated SQL queries with custom ones
-- [ ] Migrate the project to Maven
+- [x] Migrate the project to Maven
