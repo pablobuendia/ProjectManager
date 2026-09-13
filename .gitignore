@@ -24,11 +24,9 @@ hs_err_pid*
 replay_pid*
 
 HELP.md
-.gradle
+.gradle/
 build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
+target/
 
 ### STS ###
 .apt_generated
@@ -56,7 +54,6 @@ out/
 /nbbuild/
 /dist/
 /nbdist/
-/.nb-gradle/
 
 ### VS Code ###
 .vscode/
