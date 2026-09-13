@@ -25,3 +25,4 @@ Swagger documentation is available at `/swagger-ui/index.html#/` endpoint.
 - [ ] Implement sorting
 - [ ] Add Spring Security
 - [ ] Replace auto-generated SQL queries with custom ones
+- [ ] Migrate the project to Maven
